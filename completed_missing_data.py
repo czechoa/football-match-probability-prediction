@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+from pandas.api.types import is_numeric_dtype
 
 def completed_missing_data(train):
     train_org = train.copy()
@@ -37,7 +37,7 @@ def correction_col_type(data):
     train = data
     date_columns = [column for column in train.columns.values if 'date' in column]
     train[date_columns] = train[date_columns].astype('datetime64')
-    train['is_cup'] = train['is_cup'].astype('int', errors='ignore').fillna(0)
+    train['is_cup'] = train['is_cup'].fillna(0).astype('int', errors='ignore')
     return train
 
 
@@ -68,7 +68,7 @@ def convert_historical_date_to_date_difference(train):
 
 
 def remove_described_col(train):
-    col_to_not_remove = [x for x in train.columns if "name" not in x and "id" not in x and x != 'match_date']
+    col_to_not_remove = [x for x in train.columns if is_numeric_dtype(train[x]) and x != 'id']
     train = train[col_to_not_remove]
     return train
 
