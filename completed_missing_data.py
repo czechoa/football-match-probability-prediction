@@ -68,12 +68,12 @@ def convert_historical_date_to_date_difference(train):
 
 
 def remove_described_col(train):
-    col_to_not_remove = [x for x in train.columns if is_numeric_dtype(train[x]) and x != 'id']
+    col_to_not_remove = [x for x in train.columns if  ('league_id_ratting' in x)  or ( is_numeric_dtype(train[x])  and  'id' not in x) ]
     train = train[col_to_not_remove]
     return train
 
 
 def map_target(train):
-    di = {'home': 1, 'draw': 2, 'away': 3}
+    di = {'home': 1, 'draw': 0, 'away': -1}
     train = train.replace({"target": di})
     return train
