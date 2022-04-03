@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 
 def team_regeneration(data_f, team_h_or_a, index, history_matches_amount):
     i_str = str(index)

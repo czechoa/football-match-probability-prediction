@@ -1,6 +1,9 @@
+import re
+
 import pandas as pd
 import numpy as np
 from pandas.api.types import is_numeric_dtype
+
 
 def completed_missing_data(train):
     train_org = train.copy()
@@ -28,6 +31,31 @@ def completed_missing_data(train):
     return train
 
 
+def completed_missing_data_for_test_drop(test):
+    test_org = test.copy()
+
+    print('correction col type..')
+    test = correction_col_type(test)
+    check_prosense_nan_values(test, test_org)
+
+    print('remove coach columns..')
+    test = remove_coach_cols(test)
+    check_prosense_nan_values(test, test_org)
+
+    print('remove object with more that  col 80 empty...')
+    test = test[test.isnull().sum(axis=1) < 80]
+    check_prosense_nan_values(test, test_org)
+
+    print('remove all day historii without 1')
+    test = remove_all_col_dates_only_stayed_1(test)
+    check_prosense_nan_values(test, test_org)
+
+    print('remove all nan data')
+    test = test.dropna()
+    check_prosense_nan_values(test, test_org)
+
+    return test
+
 def check_prosense_nan_values(data, data_org):
     print('percent of object with nan value: ',
           f'{(data_org.shape[0] - data.dropna().shape[0]) / data_org.shape[0] * 100.:0.2f}')
@@ -53,6 +81,14 @@ def remove_9_10_col_dates(train):
     return train
 
 
+def remove_all_col_dates_only_stayed_1(train):
+    used = set()
+    columns_only_first_hist = [column for column in train.columns.values if
+                               re.sub('\d', '', column) not in used and (used.add(re.sub('\d', '', column)) or True)]
+
+    return train[columns_only_first_hist]
+
+
 def convert_historical_date_to_date_difference(train):
     home_date_columns = [column for column in train.columns.values if
                          ('date' in column and 'home' in column) or column == 'match_date']
@@ -68,7 +104,8 @@ def convert_historical_date_to_date_difference(train):
 
 
 def remove_described_col(train):
-    col_to_not_remove = [x for x in train.columns if  ('league_id_ratting' in x)  or ( is_numeric_dtype(train[x])  and  'id' not in x) ]
+    col_to_not_remove = [x for x in train.columns if
+                         ('league_id_ratting' in x) or (is_numeric_dtype(train[x]) and 'id' not in x)]
     train = train[col_to_not_remove]
     return train
 
