@@ -19,8 +19,12 @@ def history_target(data_f, team_h_or_a, index):
 
     team_history_opponent_goal = team_h_or_a + '_team_history_opponent_goal_' + i_str
 
+    data_f[team_h_or_a + '_team_history_gol_difference_' + i_str] = data_f[team_history_goal] - data_f[
+        team_history_opponent_goal]
+
     data_f[team_h_or_a + '_team_history_target_' + i_str] = np.sign(
         data_f[team_history_goal] - data_f[team_history_opponent_goal])
+
     return data_f
 
 
@@ -67,5 +71,8 @@ def adding_new_features(train, number_of_history_matches=8):
         columns={'index': 'league_id', 0: 'league_id_ratting'})
 
     train = train.merge(league_mean_ratting_all, on='league_id').sort_values(by='league_id')
+
+    target_columns = [x for x in train.columns if 'history_target' in x]
+    train = pd.get_dummies(train, columns=target_columns)
 
     return train

@@ -103,9 +103,11 @@ def convert_historical_date_to_date_difference(train):
     return train
 
 
-def remove_described_col(train):
+def remove_described_col_and_set_index_id(train):
+    train = train.set_index('id')
     col_to_not_remove = [x for x in train.columns if
                          ('league_id_ratting' in x) or (is_numeric_dtype(train[x]) and 'id' not in x)]
+
     train = train[col_to_not_remove]
     return train
 
