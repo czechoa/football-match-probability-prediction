@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def team_regeneration(data_f, team_h_or_a, index, history_matches_amount):
     i_str = str(index)
     if index == 1:
@@ -46,11 +47,9 @@ def teams_mean_ratting(data_f, team_h_or_a, index):
     return team_mean_ratting[team_h_or_a + '_team_history_rating_' + i_str]
 
 
-def adding_new_features(train):
+def adding_new_features(train, number_of_history_matches=8):
     league_mean_ratting_all = pd.DataFrame()
     teams_mean_ratting_all = pd.DataFrame()
-
-    number_of_history_matches = 8
 
     for i in range(1, number_of_history_matches + 1):
         for home_or_away in ['home', 'away']:
