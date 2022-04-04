@@ -1,12 +1,9 @@
 import pandas as pd
 
-from prepared_data.completed_missing_data import completed_missing_data, convert_historical_date_to_date_difference, \
-    remove_described_col_and_set_index_id
-
 
 def results_for_drop_data(test_org, test_with_id):
     home = 0.42
-    draw =  0.27
+    draw = 0.27
     away = 0.31
     df_all = test_org.merge(test_with_id.drop_duplicates(), on=['id'],
                             how='left', indicator=True)
@@ -19,4 +16,13 @@ def results_for_drop_data(test_org, test_with_id):
     return results_drop
 
 
+def result_predict_prob_to_dataFrame(results_test, test):
+    return pd.DataFrame(data=results_test, columns=['away', 'draw', 'home'], index=test.index).reset_index()
 
+
+def append_test_result_dropna_result(results_test, results_dropna):
+    return results_test.append(results_dropna, ignore_index=True)
+
+
+def check_results_contain_all_test_id(results, test_org):
+    print(results['id'].sort_values(by='id ') == test_org['id'].sort_values(by='id '))
