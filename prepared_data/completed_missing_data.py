@@ -1,60 +1,39 @@
 import re
 
-import pandas as pd
 import numpy as np
 from pandas.api.types import is_numeric_dtype
 
 
-def completed_missing_data(train):
-    train_org = train.copy()
+def completed_missing_data(data, number_of_history_matches):
+    data_org = data.copy()
 
     print('correction col type..')
-    train = correction_col_type(train)
-    check_prosense_nan_values(train, train_org)
+    data = correction_col_type(data)
+    check_prosense_nan_values(data, data_org)
 
     print('remove coach columns..')
-    train = remove_coach_cols(train)
-    check_prosense_nan_values(train, train_org)
+    data = remove_coach_cols(data)
+    check_prosense_nan_values(data, data_org)
 
     print('remove object with more that  col 80 empty...')
-    train = train[train.isnull().sum(axis=1) < 80]
-    check_prosense_nan_values(train, train_org)
+    data = data[data.isnull().sum(axis=1) < 80]
+    check_prosense_nan_values(data, data_org)
 
-    print('remove 9 and 10 day historii')
-    train = remove_9_10_col_dates(train)
-    check_prosense_nan_values(train, train_org)
-
-    print('remove all nan data')
-    train = train.dropna()
-    check_prosense_nan_values(train, train_org)
-
-    return train
-
-
-def completed_missing_data_for_test_drop(test):
-    test_org = test.copy()
-
-    print('correction col type..')
-    test = correction_col_type(test)
-    check_prosense_nan_values(test, test_org)
-
-    print('remove coach columns..')
-    test = remove_coach_cols(test)
-    check_prosense_nan_values(test, test_org)
-
-    print('remove object with more that  col 80 empty...')
-    test = test[test.isnull().sum(axis=1) < 80]
-    check_prosense_nan_values(test, test_org)
-
-    print('remove all day historii without 1')
-    test = remove_all_col_dates_only_stayed_1(test)
-    check_prosense_nan_values(test, test_org)
+    if number_of_history_matches == 1:
+        print('remove all day historii without 1')
+        test = remove_all_col_dates_only_stayed_1(data)
+        check_prosense_nan_values(test, data_org)
+    else:
+        print('remove 9 and 10 day historii')
+        data = remove_9_10_col_dates(data)
+        check_prosense_nan_values(data, data_org)
 
     print('remove all nan data')
-    test = test.dropna()
-    check_prosense_nan_values(test, test_org)
+    data = data.dropna()
+    check_prosense_nan_values(data, data_org)
 
-    return test
+    return data
+
 
 def check_prosense_nan_values(data, data_org):
     print('percent of object with nan value: ',
