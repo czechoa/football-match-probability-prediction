@@ -19,14 +19,9 @@ def completed_missing_data(data, number_of_history_matches):
     data = data[data.isnull().sum(axis=1) < 80]
     check_prosense_nan_values(data, data_org)
 
-    if number_of_history_matches == 1:
-        print('remove all day historii without 1')
-        test = remove_all_col_dates_only_stayed_1(data)
-        check_prosense_nan_values(test, data_org)
-    else:
-        print('remove 9 and 10 day historii')
-        data = remove_9_10_col_dates(data)
-        check_prosense_nan_values(data, data_org)
+    print('remove history columns')
+    data = remove_history_col(data, number_of_history_matches)
+    check_prosense_nan_values(data, data_org)
 
     print('remove all nan data')
     data = data.dropna()
@@ -54,18 +49,12 @@ def remove_coach_cols(train):
     return train
 
 
-def remove_9_10_col_dates(train):
-    columns_without_9_10_day = [x for x in train.columns.values if '9' not in x and '10' not in x]
-    train = train[columns_without_9_10_day]
-    return train
+def remove_history_col(train, number_of_history_matches):
+    number_history_col = list(map(str, range(1, number_of_history_matches + 1)))
 
-
-def remove_all_col_dates_only_stayed_1(train):
-    used = set()
-    columns_only_first_hist = [column for column in train.columns.values if
-                               re.sub('\d', '', column) not in used and (used.add(re.sub('\d', '', column)) or True)]
-
-    return train[columns_only_first_hist]
+    current_match_columns = [column for column in train.columns.values if 'history' not in column]
+    columns_history = [x for x in train.columns for number in number_history_col if number in x and '0' not in x]
+    return train[current_match_columns + columns_history]
 
 
 def convert_historical_date_to_date_difference(train):
