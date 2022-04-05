@@ -34,6 +34,7 @@ def league_team_mean_ratting(data_f, team_h_or_a, index):
     rating_col_name = team_h_or_a + '_team_history_league_id_' + i_str
 
     league_mean_ratting = data_f[last_match_columns].groupby(by=rating_col_name).mean()
+
     league_mean_ratting['mean_ratting_' + team_h_or_a + '_' + i_str] = (league_mean_ratting[
                                                                             team_h_or_a + '_team_history_rating_' + i_str]
                                                                         + league_mean_ratting[
@@ -51,28 +52,57 @@ def teams_mean_ratting(data_f, team_h_or_a, index):
     return team_mean_ratting[team_h_or_a + '_team_history_rating_' + i_str]
 
 
-def adding_new_features(train, number_of_history_matches=8):
-    league_mean_ratting_all = pd.DataFrame()
-    teams_mean_ratting_all = pd.DataFrame()
+def merge_team_ratting(data, teams_mean_ratting_all, home_or_away):
+    team_name_col = home_or_away + '_team_name'
+    teams_ratting = teams_mean_ratting_all.mean().reset_index().rename(
+        columns={'index': team_name_col, 0: home_or_away + '_team_mean_ratting'})
+    return data.merge(teams_ratting, on=team_name_col)
+
+
+def merge_league_ratting_get_dummies_target(data, league_mean_ratting_all):
+
+    league_mean_ratting_all_history = league_mean_ratting_all.mean().reset_index().rename(
+        columns={'index': 'league_id', 0: 'league_id_ratting'})
+
+    data = data.merge(league_mean_ratting_all_history, on='league_id').sort_values(by='league_id')
+
+    target_columns = [x for x in data.columns if 'history_target' in x]
+
+    data['sum_history_targets'] = data[target_columns].sum(axis=1)
+
+    data = pd.get_dummies(data, columns=target_columns)
+    return data
+
+
+def adding_new_features(train, number_of_history_matches=8, league_mean_ratting_all=None, teams_mean_ratting_all=None):
+    print('league_mean_ratting_all\n',league_mean_ratting_all)
+    count_league_mean = False
+    count_teams_mean_ratting = False
+    
+    if league_mean_ratting_all is None:
+        league_mean_ratting_all = pd.DataFrame()
+        count_league_mean = True
+
+    if teams_mean_ratting_all is None:
+        teams_mean_ratting_all = pd.DataFrame()
+        count_teams_mean_ratting = True
 
     for i in range(1, number_of_history_matches + 1):
         for home_or_away in ['home', 'away']:
-            league_mean_ratting_all = league_mean_ratting_all.append(league_team_mean_ratting(train, home_or_away, i))
-            teams_mean_ratting_all = teams_mean_ratting_all.append(teams_mean_ratting(train, home_or_away, i))
+
+            if count_league_mean:
+                league_mean_ratting_all = league_mean_ratting_all.append(
+                    league_team_mean_ratting(train, home_or_away, i))
+
+            if count_teams_mean_ratting:
+                teams_mean_ratting_all = teams_mean_ratting_all.append(teams_mean_ratting(train, home_or_away, i))
+
             train = history_target(train, home_or_away, i)
             train = team_regeneration(train, home_or_away, i, number_of_history_matches)
+
             if i == number_of_history_matches - 1:
-                team_name_col = home_or_away + '_team_name'
-                teams_ratting = teams_mean_ratting_all.mean().reset_index().rename(
-                    columns={'index': team_name_col, 0: home_or_away + '_team_mean_ratting'})
-                train = train.merge(teams_ratting, on=team_name_col)
+                train = merge_team_ratting(train, teams_mean_ratting_all, home_or_away)
 
-    league_mean_ratting_all = league_mean_ratting_all.mean().reset_index().rename(
-        columns={'index': 'league_id', 0: 'league_id_ratting'})
+    train = merge_league_ratting_get_dummies_target(train, league_mean_ratting_all)
 
-    train = train.merge(league_mean_ratting_all, on='league_id').sort_values(by='league_id')
-
-    target_columns = [x for x in train.columns if 'history_target' in x]
-    train = pd.get_dummies(train, columns=target_columns)
-
-    return train
+    return train, league_mean_ratting_all, teams_mean_ratting_all
