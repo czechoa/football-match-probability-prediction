@@ -74,8 +74,8 @@ def merge_league_ratting_get_dummies_target(data, league_mean_ratting_all):
     return data
 
 
-def adding_new_features(train, number_of_history_matches=8, league_mean_ratting_all=None, teams_mean_ratting_all=None):
-    print('league_mean_ratting_all\n',league_mean_ratting_all)
+def adding_new_features(data, number_of_history_matches=8, league_mean_ratting_all=None, teams_mean_ratting_all=None):
+
     count_league_mean = False
     count_teams_mean_ratting = False
     
@@ -92,17 +92,17 @@ def adding_new_features(train, number_of_history_matches=8, league_mean_ratting_
 
             if count_league_mean:
                 league_mean_ratting_all = league_mean_ratting_all.append(
-                    league_team_mean_ratting(train, home_or_away, i))
+                    league_team_mean_ratting(data, home_or_away, i))
 
             if count_teams_mean_ratting:
-                teams_mean_ratting_all = teams_mean_ratting_all.append(teams_mean_ratting(train, home_or_away, i))
+                teams_mean_ratting_all = teams_mean_ratting_all.append(teams_mean_ratting(data, home_or_away, i))
 
-            train = history_target(train, home_or_away, i)
-            train = team_regeneration(train, home_or_away, i, number_of_history_matches)
+            data = history_target(data, home_or_away, i)
+            data = team_regeneration(data, home_or_away, i, number_of_history_matches)
 
             if i == number_of_history_matches - 1:
-                train = merge_team_ratting(train, teams_mean_ratting_all, home_or_away)
+                data = merge_team_ratting(data, teams_mean_ratting_all, home_or_away)
 
-    train = merge_league_ratting_get_dummies_target(train, league_mean_ratting_all)
+    data = merge_league_ratting_get_dummies_target(data, league_mean_ratting_all)
 
-    return train, league_mean_ratting_all, teams_mean_ratting_all
+    return data, league_mean_ratting_all, teams_mean_ratting_all
