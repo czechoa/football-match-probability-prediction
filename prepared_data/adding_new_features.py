@@ -54,13 +54,18 @@ def teams_mean_ratting(data_f, team_h_or_a, index):
 
 def merge_team_ratting(data, teams_mean_ratting_all, home_or_away):
     team_name_col = home_or_away + '_team_name'
+
+    team_last_matches_ratting_col = [x for x in data.columns if home_or_away + '_team_history_rating' in x]
+
+    data[home_or_away + '_team_mean_hist_rat'] = data[team_last_matches_ratting_col].mean(axis=1)
+
     teams_ratting = teams_mean_ratting_all.mean().reset_index().rename(
-        columns={'index': team_name_col, 0: home_or_away + '_team_mean_ratting'})
+        columns={'index': team_name_col, 0: home_or_away + '_team_mean_all_ratting'})
+
     return data.merge(teams_ratting, on=team_name_col)
 
 
 def merge_league_ratting_get_dummies_target(data, league_mean_ratting_all):
-
     league_mean_ratting_all_history = league_mean_ratting_all.mean().reset_index().rename(
         columns={'index': 'league_id', 0: 'league_id_ratting'})
 
@@ -75,10 +80,9 @@ def merge_league_ratting_get_dummies_target(data, league_mean_ratting_all):
 
 
 def adding_new_features(data, number_of_history_matches=8, league_mean_ratting_all=None, teams_mean_ratting_all=None):
-
     count_league_mean = False
     count_teams_mean_ratting = False
-    
+
     if league_mean_ratting_all is None:
         league_mean_ratting_all = pd.DataFrame()
         count_league_mean = True
