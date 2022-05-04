@@ -1,51 +1,81 @@
-import re
 
 import numpy as np
+import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 
 def completed_missing_data(data, number_of_history_matches):
     data_org = data.copy()
 
-    print('correction col type..')
-    data = correction_col_type(data)
     check_prosense_nan_values(data, data_org)
 
-    print('remove coach columns..')
-    data = remove_coach_cols(data)
-    check_prosense_nan_values(data, data_org)
+    print('remove history columns',list(range(number_of_history_matches+1,11)))
 
-    print('remove object with more that  col 80 empty...')
-    data = data[data.isnull().sum(axis=1) < 80]
-    check_prosense_nan_values(data, data_org)
-
-    print('remove history columns')
     data = remove_history_col(data, number_of_history_matches)
     check_prosense_nan_values(data, data_org)
 
-    print('remove all nan data')
-    data = data.dropna()
+    print('remove object with more that  col 50 % empty...')
+    data = data[data.isnull().sum(axis=1) < data.shape[0]/2]
     check_prosense_nan_values(data, data_org)
+
+    print('date to datetime type and remove nan date....')
+    data = date_col_to_datetime_type(data)
+    check_prosense_nan_values(data, data_org)
+
+
+    print('filna coach_id and change to is new coach')
+    # data = remove_coach_cols(data)
+    data = fillna_with_zero_coach_cols(data)
+    data = change_id_coach_to_is_change_coach(data)
+    check_prosense_nan_values(data, data_org)
+
+
+
+    print('fill zero nan data')
+    # data = data.dropna()
+    data = data.fillna(0)
+
+    check_prosense_nan_values(data, data_org)
+
 
     return data
 
 
 def check_prosense_nan_values(data, data_org):
-    print('percent of object with nan value: ',
-          f'{(data_org.shape[0] - data.dropna().shape[0]) / data_org.shape[0] * 100.:0.2f}')
+    print('percent of object with nan value and orginals: ',
+          f'{(data.shape[0] - data.dropna().shape[0]) / data.shape[0] * 100.:0.2f}, {data.shape[0]/data_org.shape[0] *100.:02f}')
 
 
-def correction_col_type(data):
-    train = data
-    date_columns = [column for column in train.columns.values if 'date' in column]
-    train[date_columns] = train[date_columns].astype('datetime64')
-    train['is_cup'] = train['is_cup'].fillna(0).astype('int', errors='ignore')
-    return train
+def date_col_to_datetime_type(data):
+    date_columns = [column for column in data.columns.values if 'date' in column]
+
+    data[date_columns] = data[date_columns].astype('datetime64')
+    data = data[(data[date_columns].isna().sum(axis=1) < 1)]
+    # train['is_cup'] = train['is_cup'].fillna(0).astype('int', errors='ignore')
+    return data
 
 
 def remove_coach_cols(train):
     columns_without_coach_col = [column for column in train.columns if 'coach' not in column]
     train = train[columns_without_coach_col]
+    return train
+
+def change_id_coach_to_is_change_coach(data):
+
+    coach_col = [x for x in data.columns if 'coach' in x]
+    home_coach_col = [x for x in coach_col if 'home' in x]
+    away_coach_col = [x for x in coach_col if 'away' in x]
+
+    for i in range(len(home_coach_col) - 1):
+        data[home_coach_col[i]] = (data[home_coach_col[i]] != data[home_coach_col[i + 1]]) * 1
+        data[away_coach_col[i]] = (data[away_coach_col[i]] != data[away_coach_col[i + 1]]) * 1
+
+    data = data.drop(columns=[home_coach_col[-1], away_coach_col[-1]])
+    return data
+
+def fillna_with_zero_coach_cols(train):
+    coach_col = [column for column in train.columns if 'coach' in column]
+    train[coach_col] = train[coach_col].fillna(0)
     return train
 
 
@@ -84,3 +114,7 @@ def map_target(train):
     di = {'home': 1, 'draw': 0, 'away': -1}
     train = train.replace({"target": di})
     return train
+# %%
+# train_org = pd.read_csv('data/train.csv')
+# train = completed_missing_data(train_org,6)
+
