@@ -7,36 +7,33 @@ from pandas.api.types import is_numeric_dtype
 def completed_missing_data(data, number_of_history_matches):
     data_org = data.copy()
 
-    check_prosense_nan_values(data, data_org)
+    # check_prosense_nan_values(data, data_org)
 
-    print('remove history columns',list(range(number_of_history_matches+1,11)))
+    # print('remove history columns',list(range(number_of_history_matches+1,11)))
 
     data = remove_history_col(data, number_of_history_matches)
-    check_prosense_nan_values(data, data_org)
+    # check_prosense_nan_values(data, data_org)
 
-    print('remove object with more that  col 50 % empty...')
+    # print('remove object with more that  col 50 % empty...')
     data = data[data.isnull().sum(axis=1) < data.shape[0]/2]
-    check_prosense_nan_values(data, data_org)
+    # check_prosense_nan_values(data, data_org)
 
-    print('date to datetime type and remove nan date....')
+    # print('date to datetime type and remove nan date....')
     data = date_col_to_datetime_type(data)
-    check_prosense_nan_values(data, data_org)
+    # check_prosense_nan_values(data, data_org)
 
 
-    print('filna coach_id and change to is new coach')
+    # print('filna coach_id and change to is new coach')
     # data = remove_coach_cols(data)
     data = fillna_with_zero_coach_cols(data)
     data = change_id_coach_to_is_change_coach(data)
-    check_prosense_nan_values(data, data_org)
+    # check_prosense_nan_values(data, data_org)
 
-
-
-    print('fill zero nan data')
-    # data = data.dropna()
+    # print('fill zero nan data')
     data = data.fillna(0)
+    data['is_cup'] = data['is_cup'].astype('int', errors='ignore')
 
     check_prosense_nan_values(data, data_org)
-
 
     return data
 
@@ -51,7 +48,6 @@ def date_col_to_datetime_type(data):
 
     data[date_columns] = data[date_columns].astype('datetime64')
     data = data[(data[date_columns].isna().sum(axis=1) < 1)]
-    # train['is_cup'] = train['is_cup'].fillna(0).astype('int', errors='ignore')
     return data
 
 
@@ -103,6 +99,7 @@ def convert_historical_date_to_date_difference(train):
 
 def remove_described_col_and_set_index_id(train):
     train = train.set_index('id')
+
     col_to_not_remove = [x for x in train.columns if
                          ('league_id_ratting' in x) or (is_numeric_dtype(train[x]) and 'id' not in x) or (x == 'target')]
 
@@ -114,7 +111,4 @@ def map_target(train):
     di = {'home': 1, 'draw': 0, 'away': -1}
     train = train.replace({"target": di})
     return train
-# %%
-# train_org = pd.read_csv('data/train.csv')
-# train = completed_missing_data(train_org,6)
 
