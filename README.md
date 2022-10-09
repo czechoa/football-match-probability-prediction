@@ -65,7 +65,7 @@ Using, greedy forward feature selection, it came out that only the team ranking 
 Final model
 ===================
 
-In the end, I used a simple neural network, which achieved minimally better results than logistic regression. The selection of the parameters of the neural network, I made on the basis of 5 measurements of differently divided training and validation set (StratifiedKFold applications). I saved the learning result for the 5 samples to a file along with the calculated median error. Also to evaluate the learning, I used a tensorboard that drew a graph of error and relevance for the tested models. In addition to the model parameter, I tested whether min max normalization performed better than standardization, and for how many historical backward matches the models perform best.
+In the end, I used a simple neural network, which achieved minimally better results than logistic regression. The selection of the parameters of the neural network, I made on the basis of 5 measurements of differently divided training and validation set (StratifiedKFold). I saved the learning result for the 5 samples to a file along with the calculated median error. Also to evaluate the learning, I used a tensorboard that drew a graph of error and relevance for the tested models. In addition to the model parameter, I tested whether min max normalization performed better than standardization, and for how many historical backward matches the models perform best.
 
 ```
 model = tf.keras.Sequential([
