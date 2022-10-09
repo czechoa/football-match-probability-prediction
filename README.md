@@ -1,7 +1,3 @@
-These are my programs for computer graphics in my third year of college.
-
-Both programs written in Python, using numpy vectoring for optimization.
-
 Purpose of the project
 ==================
 
@@ -11,10 +7,11 @@ Source
 ==================
 The data comes from the kaggle competition:
 
-[I'm an inline-style link](https://www.kaggle.com/competitions/football-match-probability-prediction/data)
+[football-match-probability-prediction/data](https://www.kaggle.com/competitions/football-match-probability-prediction/data)
 
 Data description
 ===================
+
 The dataset contains more than 150000 historical soccer matches around the world from 2019-2021, with more than 860 leagues and 9500 teams described on 386 attribute.
 
 
@@ -101,8 +98,6 @@ Operation of the prediction model
 * For the test data do not have a history of 4 matches, I will make a prediction by logical regression.
 * For the remaining test data that did not even have a history of 1 match, save the result of home:42%,draw:27%,away:31%.
 * Saving the prediction result and inserting into kaggle. 
-    
-
 
 Kaggle scores
 ===================
@@ -112,7 +107,6 @@ I only reached 224th place with a score of 1.03189, where the buchmakers score w
 However, a naive model that is based only on the probability distribution home:42%, draw:27%, away:31%.
 
 It got a score, with a kaggle equal to 1.07.
-
 
 Conclusions
 ===================
