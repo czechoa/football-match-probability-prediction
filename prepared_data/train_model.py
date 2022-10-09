@@ -1,23 +1,25 @@
+import os
+import re
 from datetime import datetime
 from pathlib import Path
-import re
+
 import tensorflow as tf
-import os
 
 
 def callbacks(model_name):
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', verbose=1, patience=5)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', verbose=1, patience=5)
 
-    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.25, patience=5,
+    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.25, patience=5,
                                                      verbose=1, cooldown=0, min_lr=0.0001)
 
-    checkpoint_filepath = Path(f'saved_model/checkpoint/final_result/' + datetime.now().strftime("%Y:%m:%d-%H:%M:%S") +'_epoch{epoch:02d}-loss{val_loss:.3f}-train{loss:.3f}.hdf5')
+    checkpoint_filepath = Path(f'saved_model/checkpoint/final_result_train/' + datetime.now().strftime(
+        "%Y:%m:%d-%H:%M:%S") + '_epoch{epoch:02d}-train{loss:.3f}.hdf5')
 
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=True,
-        monitor='val_loss',
-        mode='min',)
+        monitor='loss',
+        mode='min')
 
     log_dir = Path(f'logs/fit/{model_name}')
 
@@ -32,6 +34,7 @@ def split_features_target_and_map_target(data):
     di = {'home': 2, 'draw': 1, 'away': 0}
     target = target.replace(di)
     return train_features, target
+
 
 def save_results(output_path, output_string, model_summary=None):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

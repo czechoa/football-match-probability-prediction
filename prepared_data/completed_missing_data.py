@@ -1,6 +1,4 @@
-
 import numpy as np
-import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 
@@ -15,13 +13,12 @@ def completed_missing_data(data, number_of_history_matches):
     # check_prosense_nan_values(data, data_org)
 
     # print('remove object with more that  col 50 % empty...')
-    data = data[data.isnull().sum(axis=1) < data.shape[0]/2]
+    data = data[data.isnull().sum(axis=1) < data.shape[0] / 2]
     # check_prosense_nan_values(data, data_org)
 
     # print('date to datetime type and remove nan date....')
     data = date_col_to_datetime_type(data)
     # check_prosense_nan_values(data, data_org)
-
 
     # print('filna coach_id and change to is new coach')
     # data = remove_coach_cols(data)
@@ -40,7 +37,7 @@ def completed_missing_data(data, number_of_history_matches):
 
 def check_prosense_nan_values(data, data_org):
     print('percent of object with nan value and orginals: ',
-          f'{(data.shape[0] - data.dropna().shape[0]) / data.shape[0] * 100.:0.2f}, {data.shape[0]/data_org.shape[0] *100.:02f}')
+          f'{(data.shape[0] - data.dropna().shape[0]) / data.shape[0] * 100.:0.2f}, {data.shape[0] / data_org.shape[0] * 100.:02f}')
 
 
 def date_col_to_datetime_type(data):
@@ -56,8 +53,8 @@ def remove_coach_cols(train):
     train = train[columns_without_coach_col]
     return train
 
-def change_id_coach_to_is_change_coach(data):
 
+def change_id_coach_to_is_change_coach(data):
     coach_col = [x for x in data.columns if 'coach' in x]
     home_coach_col = [x for x in coach_col if 'home' in x]
     away_coach_col = [x for x in coach_col if 'away' in x]
@@ -68,6 +65,7 @@ def change_id_coach_to_is_change_coach(data):
 
     data = data.drop(columns=[home_coach_col[-1], away_coach_col[-1]])
     return data
+
 
 def fillna_with_zero_coach_cols(train):
     coach_col = [column for column in train.columns if 'coach' in column]
@@ -101,7 +99,8 @@ def remove_described_col_and_set_index_id(train):
     train = train.set_index('id')
 
     col_to_not_remove = [x for x in train.columns if
-                         ('league_id_ratting' in x) or (is_numeric_dtype(train[x]) and 'id' not in x) or (x == 'target')]
+                         ('league_id_ratting' in x) or (is_numeric_dtype(train[x]) and 'id' not in x) or (
+                                 x == 'target')]
 
     train = train[col_to_not_remove]
     return train
@@ -111,4 +110,3 @@ def map_target(train):
     di = {'home': 1, 'draw': 0, 'away': -1}
     train = train.replace({"target": di})
     return train
-

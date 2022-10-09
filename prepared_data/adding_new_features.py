@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def team_regeneration(data_f, team_h_or_a, index, history_matches_amount):
@@ -36,8 +36,8 @@ def league_team_mean_ratting(data_f, team_h_or_a, index):
     league_mean_ratting = data_f[last_match_columns].groupby(by=rating_col_name).mean()
 
     league_mean_ratting['mean_ratting_' + team_h_or_a + '_' + i_str] = (league_mean_ratting[
-                                                                            team_h_or_a + '_team_history_rating_' + i_str]
-                                                                        + league_mean_ratting[
+                                                                            team_h_or_a + '_team_history_rating_' + i_str] +
+                                                                        league_mean_ratting[
                                                                             team_h_or_a + '_team_history_opponent_rating_' + i_str]) / 2
 
     return league_mean_ratting['mean_ratting_' + team_h_or_a + '_' + i_str]

@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def results_for_drop_data(test_org, test):
+    # 100%   0.42 + 0.27 +  0.31
     home = 0.42
     draw = 0.27
     away = 0.31
@@ -34,8 +35,7 @@ def check_results_contain_all_test_id(results, test_org):
 
 def not_duplicate_elements_in_dataframes(test_org, test):
     test = test.reset_index()
-    df_all = test_org.merge(test.drop_duplicates(), on=['id'],
-                            how='left', indicator=True)
+    df_all = test_org.merge(test.drop_duplicates(), on=['id'], how='left', indicator=True)
 
     test_not_duplicate = test_org[df_all['_merge'] == 'left_only']
 
