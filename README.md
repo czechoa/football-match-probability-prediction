@@ -1,7 +1,3 @@
-These are my programs for computer graphics in my third year of college.
-
-Both programs written in Python, using numpy vectoring for optimization.
-
 Purpose of the project
 ==================
 
@@ -11,10 +7,11 @@ Source
 ==================
 The data comes from the kaggle competition:
 
-[I'm an inline-style link](https://www.kaggle.com/competitions/football-match-probability-prediction/data)
+[football-match-probability-prediction/data](https://www.kaggle.com/competitions/football-match-probability-prediction/data)
 
 Data description
 ===================
+
 The dataset contains more than 150000 historical soccer matches around the world from 2019-2021, with more than 860 leagues and 9500 teams described on 386 attribute.
 
 
@@ -51,7 +48,6 @@ Distribution of probability of winning the match
 
 ![image](image/Rozkład_prawdobodopienstwa_wygrania_meczu.png)
 
-As you can see, 42% of matches end in a win for the team playing at home and 31% away while 27% of the matches end in a draw.
 
 
 Tested classical models
@@ -69,7 +65,7 @@ Using, greedy forward feature selection, it came out that only the team ranking 
 Final model
 ===================
 
-In the end, I used a simple neural network, which achieved minimally better results than logistic regression. The selection of the parameters of the neural network, I made on the basis of 5 measurements of differently divided training and validation set (StratifiedKFold applications). I saved the learning result for the 5 samples to a file along with the calculated median error. Also to evaluate the learning, I used a tensorboard that drew a graph of error and relevance for the tested models. In addition to the model parameter, I tested whether min max normalization performed better than standardization, and for how many historical backward matches the models perform best.
+In the end, I used a simple neural network, which achieved minimally better results than logistic regression. The selection of the parameters of the neural network, I made on the basis of 5 measurements of differently divided training and validation set (StratifiedKFold). I saved the learning result for the 5 samples to a file along with the calculated median error. Also to evaluate the learning, I used a tensorboard that drew a graph of error and relevance for the tested models. In addition to the model parameter, I tested whether min max normalization performed better than standardization, and for how many historical backward matches the models perform best.
 
 ```
 model = tf.keras.Sequential([
@@ -101,8 +97,6 @@ Operation of the prediction model
 * For the test data do not have a history of 4 matches, I will make a prediction by logical regression.
 * For the remaining test data that did not even have a history of 1 match, save the result of home:42%,draw:27%,away:31%.
 * Saving the prediction result and inserting into kaggle. 
-    
-
 
 Kaggle scores
 ===================
@@ -112,7 +106,6 @@ I only reached 224th place with a score of 1.03189, where the buchmakers score w
 However, a naive model that is based only on the probability distribution home:42%, draw:27%, away:31%.
 
 It got a score, with a kaggle equal to 1.07.
-
 
 Conclusions
 ===================
