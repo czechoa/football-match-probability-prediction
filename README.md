@@ -48,7 +48,6 @@ Distribution of probability of winning the match
 
 ![image](image/Rozkład_prawdobodopienstwa_wygrania_meczu.png)
 
-As you can see, 42% of matches end in a win for the team playing at home and 31% away while 27% of the matches end in a draw.
 
 
 Tested classical models
