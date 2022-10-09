@@ -1,5 +1,5 @@
-from prepared_data.adding_new_features import adding_new_features
-from prepared_data.completed_missing_data import completed_missing_data, convert_historical_date_to_date_difference, \
+from utils.adding_new_features import adding_new_features
+from utils.completed_missing_data import completed_missing_data, convert_historical_date_to_date_difference, \
     map_target, remove_described_col_and_set_index_id
 
 
